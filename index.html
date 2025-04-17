@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with GPT</title>
+    <style>
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #chat-box {
+            width: 100%;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #message {
+            width: 80%;
+            padding: 10px;
+        }
+        #send {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat with GPT</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="message" placeholder="Type a message...">
+    <button id="send">Send</button>
+
+    <script>
+        // Function to send the prompt to the backend and get the response
+        document.getElementById('send').onclick = async function() {
+            const message = document.getElementById('message').value;
+            const response = await fetch('http://127.0.0.1:5000/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
+            
+            // Display the response in the chat-box (user-friendly)
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+            if (data.error) {
+                chatBox.innerHTML += `<p><strong>GPT (Error):</strong> ${data.error}</p>`;
+            } else {
+                chatBox.innerHTML += `<p><strong>GPT (Explanation):</strong> ${data.explanation}</p>`;
+                chatBox.innerHTML += `<pre><strong>Mermaid Diagram:</strong>\n${data.Architecture}</pre>`;
+            }
+            // Clear the input field
+            document.getElementById('message').value = '';
+        };
+    </script>
+</body>
+</html>
